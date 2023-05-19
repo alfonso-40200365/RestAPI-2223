@@ -1,0 +1,28 @@
+{
+  "name": "restapi-2223",
+  "version": "1.0.0",
+  "description": "Rest API for PWII",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsc -w & nodemon dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alfonso-40200365/RestAPI-2223.git"
+  },
+  "author": "Alfonso Villanueva",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alfonso-40200365/RestAPI-2223/issues"
+  },
+  "homepage": "https://github.com/alfonso-40200365/RestAPI-2223#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "nodemon": "^2.0.22"
+  }
+}
