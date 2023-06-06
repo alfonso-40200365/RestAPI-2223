@@ -11,4 +11,8 @@ router.get('/:id', roomController_1.getRoomById);
 router.get('/:id/like', roomController_1.functionTODO);
 router.get('/:id/comment', roomController_1.functionTODO);
 router.get('/:id/reserve', roomController_1.functionTODO);
+router.post('/myRooms', roomController_1.functionTODO);
+router.get('/myRooms', roomController_1.functionTODO);
+router.get('/myRooms/:id', roomController_1.functionTODO);
+router.patch('/myRooms/:id', roomController_1.functionTODO);
 exports.default = router;

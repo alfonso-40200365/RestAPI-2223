@@ -1,24 +1,39 @@
-import express from 'express' 
-import dotenv from 'dotenv' 
-dotenv.config() 
+import express from 'express'
+import dotenv from 'dotenv'
+import { getConnection } from './database/provider'
 
-import authRoutes from './routes/authRoutes' 
-import roomRoutes from './routes/roomRoutes' 
-import eventRoutes from './routes/eventRoutes' 
+dotenv.config()
 
-const port: number = +(process.env.PORT as string) 
-const host: string = process.env.HOST as string 
+import authRoutes from './routes/authRoutes'
+import roomRoutes from './routes/roomRoutes'
+import eventRoutes from './routes/eventRoutes'
+import adminRoutes from './routes/adminRoutes'
 
-const app = express()
+const port: number = +(process.env.PORT as string)
+const host: string = process.env.HOST as string
 
-app.use('/auth', authRoutes)
-app.use('/rooms', roomRoutes)
-app.use('/events', eventRoutes) 
+(async () => {
+    try {
+        await getConnection()
 
-app.all('*', (req, res) => {
-  res.status(404).json({ message: 'API Rest | Unknown Route' }) 
-})
+        const app = express()
 
-app.listen(port, host, () =>
-  console.log(`App listening to http://${host}:${port}/`)
-)
+        app.use(express.json());
+
+        app.use('/', authRoutes)
+        app.use('/rooms', roomRoutes)
+        app.use('/events', eventRoutes)
+        app.use('/admin', adminRoutes)
+
+        app.all('*', (req, res) => {
+            res.status(404).json({ message: 'API Rest | Unknown Route' })
+        })
+
+        app.listen(port, host, () =>
+            console.log(`App listening to http://${host}:${port}/`)
+        )
+    } catch (error) {
+        console.error('Failed to establish MongoDB connection:', error)
+        process.exit(1)
+    }
+})()

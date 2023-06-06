@@ -1,9 +1,70 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.register = exports.login = void 0;
-const login = (req, res) => {
-};
+const provider_1 = require("../database/provider");
+const userModel_1 = __importDefault(require("../models/userModel"));
+const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("Login");
+    const { username, password } = req.body;
+    let user;
+    try {
+        if (username === undefined || password === undefined) {
+            return res.status(400).json({ message: 'Please provide username and password' });
+        }
+        user = yield (0, userModel_1.default)(provider_1.connection)
+            .findOne({ username, password })
+            .exec();
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid username or password' });
+        }
+        const auth = {
+            userId: user.id
+        };
+        return res.status(200).json({ message: 'Login successful', auth });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Oops! Something went wrong...' });
+    }
+});
 exports.login = login;
-const register = (req, res) => {
-};
+const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("Register");
+    const { username, password, email, type } = req.body;
+    let user;
+    try {
+        if (username === undefined || password === undefined || email === undefined || type === undefined) {
+            return res.status(400).json({ message: 'Please provide username, password, email and type' });
+        }
+        user = yield (0, userModel_1.default)(provider_1.connection)
+            .findOne({ username })
+            .exec();
+        if (user) {
+            return res.status(409).json({ message: 'Username already exists' });
+        }
+        user = yield (0, userModel_1.default)(provider_1.connection)
+            .create({ username, password, email, verified: false, type });
+        if (!user) {
+            return res.status(500).json({ message: 'Failed to create user' });
+        }
+        const auth = {
+            userId: user.id
+        };
+        return res.status(200).json({ message: 'User created successful', auth });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Oops! Something went wrong...' });
+    }
+});
 exports.register = register;
