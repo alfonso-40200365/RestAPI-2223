@@ -17,7 +17,7 @@ export const login = async (req: Request, res: Response) => {
         }
 
         user = await UserModel(connection)
-            .findOne({ username, password })
+            .findOne({ username })
             .exec()
 
         if (!user) {
@@ -30,7 +30,8 @@ export const login = async (req: Request, res: Response) => {
         }
         
         const auth = {
-            userId: user.id
+            userId: user.id,
+            userType: user.type
         }
 
         return res.status(200).json({ message: 'Login successful', auth })
@@ -71,10 +72,11 @@ export const register = async (req: Request, res: Response) => {
         }
 
         const auth = {
-            userId: user.id
+            userId: user.id,
+            userType: user.type
         }
 
-        return res.status(200).json({ message: 'User created successful', auth })
+        return res.status(201).json({ message: 'User created successful', auth })
 
     } catch (error) {
         return res.status(500).json({ message: 'Oops! Something went wrong...' })

@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.register = exports.login = void 0;
 const provider_1 = require("../database/provider");
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const userModel_1 = __importDefault(require("../models/userModel"));
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Login");
@@ -24,13 +25,18 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return res.status(400).json({ message: 'Please provide username and password' });
         }
         user = yield (0, userModel_1.default)(provider_1.connection)
-            .findOne({ username, password })
+            .findOne({ username })
             .exec();
         if (!user) {
-            return res.status(401).json({ message: 'Invalid username or password' });
+            return res.status(401).json({ message: 'Invalid username' });
+        }
+        const isPasswordValid = yield bcryptjs_1.default.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: 'Invalid password' });
         }
         const auth = {
-            userId: user.id
+            userId: user.id,
+            userType: user.type
         };
         return res.status(200).json({ message: 'Login successful', auth });
     }
@@ -48,20 +54,23 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return res.status(400).json({ message: 'Please provide username, password, email and type' });
         }
         user = yield (0, userModel_1.default)(provider_1.connection)
-            .findOne({ username })
+            .findOne({ $or: [{ username }, { email }] })
             .exec();
         if (user) {
-            return res.status(409).json({ message: 'Username already exists' });
+            return res.status(409).json({ message: 'Username or E-mail already exists' });
         }
+        const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
+        console.log(hashedPassword);
         user = yield (0, userModel_1.default)(provider_1.connection)
-            .create({ username, password, email, verified: false, type });
+            .create({ username, password: hashedPassword, email, verified: false, type });
         if (!user) {
             return res.status(500).json({ message: 'Failed to create user' });
         }
         const auth = {
-            userId: user.id
+            userId: user.id,
+            userType: user.type
         };
-        return res.status(200).json({ message: 'User created successful', auth });
+        return res.status(201).json({ message: 'User created successful', auth });
     }
     catch (error) {
         return res.status(500).json({ message: 'Oops! Something went wrong...' });
