@@ -2,7 +2,6 @@ import { Request, Response } from 'express'
 import { connection } from '../database/provider'
 import bcrypt from 'bcryptjs' 
 
-
 import UserModel, { IUser } from '../models/userModel'
 
 export const getUser = async (req: Request, res: Response) => {
@@ -12,7 +11,7 @@ export const getUser = async (req: Request, res: Response) => {
     let user: IUser | null
 
     try {
-        if (username === undefined || password === undefined) {
+        if (!username || !password) {
             return res.status(400).json({ message: 'Please provide username and password' })
         }
 
@@ -49,7 +48,7 @@ export const createUser = async (req: Request, res: Response) => {
     let user: IUser | null
 
     try {
-        if (username === undefined || password === undefined || email === undefined || type === undefined) {
+        if (!username || !password || !email || !type) {
             return res.status(400).json({ message: 'Please provide username, password, email and type' })
         }
 

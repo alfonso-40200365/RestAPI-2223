@@ -21,7 +21,7 @@ const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, password } = req.body;
     let user;
     try {
-        if (username === undefined || password === undefined) {
+        if (!username || !password) {
             return res.status(400).json({ message: 'Please provide username and password' });
         }
         user = yield (0, userModel_1.default)(provider_1.connection)
@@ -50,7 +50,7 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     const { username, password, email, type } = req.body;
     let user;
     try {
-        if (username === undefined || password === undefined || email === undefined || type === undefined) {
+        if (!username || !password || !email || !type) {
             return res.status(400).json({ message: 'Please provide username, password, email and type' });
         }
         user = yield (0, userModel_1.default)(provider_1.connection)

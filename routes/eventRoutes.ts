@@ -1,5 +1,6 @@
-import express from 'express' 
-import { getEvents, getEventById, functionTODO } from '../controllers/eventController' 
+import express, { Request, Response } from 'express'
+import { AuthenticatedRequest } from '../models/Model'
+import { getEvents, getEventById, functionTODO, createMyEvent, getMyEvents, getMyEventById, updateMyEventById, deleteMyEventById } from '../controllers/eventController' 
 
 const router = express.Router() 
 
@@ -8,7 +9,7 @@ router.get('/:id', getEventById)
 router.get('/:id/like', functionTODO) 
 router.get('/:id/comment', functionTODO) 
 
-router.post('/myEvents', createMyEvent)
+router.post('/myEvents', (req: Request, res: Response) => createMyEvent(req as AuthenticatedRequest, res));
 
 router.get('/myEvents', getMyEvents)
 router.get('/myEvents/:id', getMyEventById)
