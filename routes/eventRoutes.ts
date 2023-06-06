@@ -8,11 +8,13 @@ router.get('/:id', getEventById)
 router.get('/:id/like', functionTODO) 
 router.get('/:id/comment', functionTODO) 
 
-router.post('/myEvents', functionTODO)
+router.post('/myEvents', createMyEvent)
 
-router.get('/myEvents', functionTODO)
-router.get('/myEvents/:id', functionTODO)
+router.get('/myEvents', getMyEvents)
+router.get('/myEvents/:id', getMyEventById)
 
-router.patch('/myEvents/:id', functionTODO)
+router.patch('/myEvents/:id', updateMyEventById)
+
+router.delete('/myEvents/:id', deleteMyEventById)
 
 export default router 
