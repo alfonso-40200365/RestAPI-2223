@@ -16,4 +16,6 @@ router.get('/myRooms/:id', functionTODO)
 
 router.patch('/myRooms/:id', functionTODO)
 
+router.delete('/myRooms/:id', functionTODO)
+
 export default router 

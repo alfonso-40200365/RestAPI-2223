@@ -12,12 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.register = exports.login = void 0;
+exports.createUser = exports.getUser = void 0;
 const provider_1 = require("../database/provider");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const userModel_1 = __importDefault(require("../models/userModel"));
-const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("Login");
+const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("Get User");
     const { username, password } = req.body;
     let user;
     try {
@@ -44,9 +44,9 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.status(500).json({ message: 'Oops! Something went wrong...' });
     }
 });
-exports.login = login;
-const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("Register");
+exports.getUser = getUser;
+const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("Create User");
     const { username, password, email, type } = req.body;
     let user;
     try {
@@ -76,4 +76,4 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.status(500).json({ message: 'Oops! Something went wrong...' });
     }
 });
-exports.register = register;
+exports.createUser = createUser;

@@ -18,7 +18,7 @@ const host: string = process.env.HOST as string
 
         const app = express()
 
-        app.use(express.json());
+        app.use(express.json()) 
 
         app.use('/', authRoutes)
         app.use('/rooms', roomRoutes)

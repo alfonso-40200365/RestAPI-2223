@@ -15,4 +15,5 @@ router.post('/myRooms', roomController_1.functionTODO);
 router.get('/myRooms', roomController_1.functionTODO);
 router.get('/myRooms/:id', roomController_1.functionTODO);
 router.patch('/myRooms/:id', roomController_1.functionTODO);
+router.delete('/myRooms/:id', roomController_1.functionTODO);
 exports.default = router;

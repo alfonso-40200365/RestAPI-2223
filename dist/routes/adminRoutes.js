@@ -6,8 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const adminController_1 = require("../controllers/adminController");
 const router = express_1.default.Router();
-router.delete('/rooms/:id', adminController_1.functionTODO);
-router.delete('/events/:id', adminController_1.functionTODO);
 router.get('/owners', adminController_1.functionTODO);
 router.get('/owners/:id', adminController_1.functionTODO);
 router.patch('/owners/:id', adminController_1.functionTODO);

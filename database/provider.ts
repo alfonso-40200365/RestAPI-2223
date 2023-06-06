@@ -14,7 +14,7 @@ export const getConnection = async (): Promise<mongoose.Connection> => {
                 bufferCommands: false,
                 autoIndex: true,
                 autoCreate: true,
-            });
+            }) 
             console.log('Connection to DB was successful')
             connection = mongoose.connection
         } catch (error) {

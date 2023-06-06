@@ -1,12 +1,12 @@
 import { Request, Response } from 'express'
 import { connection } from '../database/provider'
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs' 
 
 
 import UserModel, { IUser } from '../models/userModel'
 
-export const login = async (req: Request, res: Response) => {
-    console.log("Login")
+export const getUser = async (req: Request, res: Response) => {
+    console.log("Get User")
 
     const { username, password } = req.body
     let user: IUser | null
@@ -42,8 +42,8 @@ export const login = async (req: Request, res: Response) => {
 
 }
 
-export const register = async (req: Request, res: Response) => {
-    console.log("Register")
+export const createUser = async (req: Request, res: Response) => {
+    console.log("Create User")
 
     const { username, password, email, type } = req.body
     let user: IUser | null
@@ -61,7 +61,7 @@ export const register = async (req: Request, res: Response) => {
             return res.status(409).json({ message: 'Username or E-mail already exists' })
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10) 
         console.log(hashedPassword)
 
         user = await UserModel(connection)
