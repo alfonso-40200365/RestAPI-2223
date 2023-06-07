@@ -5,9 +5,10 @@ const router = express.Router()
 
 router.get('/', getRooms) 
 router.get('/:id', getRoomById) 
-router.get('/:id/like', functionTODO) 
-router.get('/:id/comment', functionTODO) 
-router.get('/:id/reserve', functionTODO) 
+
+router.patch('/:id/like', functionTODO) 
+router.patch('/:id/comment', functionTODO) 
+router.patch('/:id/reserve', functionTODO) 
 
 router.post('/myRooms', functionTODO)
 

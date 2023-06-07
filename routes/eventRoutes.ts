@@ -5,9 +5,9 @@ import { getEvents, getEventById, functionTODO, createMyEvent, getMyEvents, getM
 const router = express.Router() 
 
 router.get('/', getEvents) 
-router.get('/:id', getEventById) 
-router.get('/:id/like', functionTODO) 
-router.get('/:id/comment', functionTODO) 
+router.patch('/:id', getEventById) 
+router.patch('/:id/like', functionTODO) 
+router.patch('/:id/comment', functionTODO) 
 
 router.post('/myEvents', (req: Request, res: Response) => createMyEvent(req as AuthenticatedRequest, res));
 
