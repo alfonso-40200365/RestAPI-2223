@@ -78,8 +78,10 @@ export const createMyEvent = async (req: AuthenticatedRequest, res: Response) =>
     console.log("Create My Event")
 
     const { ownerId, reviewId, title, description, location, type } = req.body
-    const { authid, authtype } = req.headers
+    const { authid, authtype, accessToken } = req.headers
     let { date } = req.body
+
+    console.log(accessToken)
 
     let event: IEvent | null
 
