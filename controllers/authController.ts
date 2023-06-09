@@ -83,6 +83,7 @@ export const createUser = async (req: Request, res: Response) => {
 
 
 export function verifyToken(req: Request, res: Response) {
+    console.log('Verify Token')
 
     const header = req.headers.authorization
 
