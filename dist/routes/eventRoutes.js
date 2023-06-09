@@ -12,9 +12,9 @@ router.get('/myEvents', (req, res, next) => (0, authController_1.verifyToken)(re
 router.get('/myEvents/:id', (req, res, next) => (0, authController_1.verifyToken)(req, res, next), (req, res) => (0, eventController_1.getMyEventById)(req, res));
 router.patch('/myEvents/:id', (req, res, next) => (0, authController_1.verifyToken)(req, res, next), (req, res) => (0, eventController_1.updateMyEventById)(req, res));
 router.delete('/myEvents/:id', (req, res, next) => (0, authController_1.verifyToken)(req, res, next), (req, res) => (0, eventController_1.deleteMyEventById)(req, res));
+//apagar event e review com eventId == id
 router.get('/', eventController_1.getEvents);
 router.get('/:id', eventController_1.getEventById);
-router.patch('/:id/like', eventController_1.functionTODO);
-router.patch('/:id/comment', eventController_1.functionTODO);
-//apagar event e review com eventId == id
+router.patch('/:id/like', eventController_1.getEventByIdLike);
+router.patch('/:id/comment', eventController_1.getEventByIdComment);
 exports.default = router;

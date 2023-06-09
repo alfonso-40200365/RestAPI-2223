@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteMyEventById = exports.updateMyEventById = exports.getMyEventById = exports.getMyEvents = exports.createMyEvent = exports.functionTODO = exports.getEventById = exports.getEvents = void 0;
+exports.deleteMyEventById = exports.updateMyEventById = exports.getMyEventById = exports.getMyEvents = exports.createMyEvent = exports.getEventByIdComment = exports.getEventByIdLike = exports.getEventById = exports.getEvents = void 0;
 const provider_1 = require("../database/provider");
 const reviewModel_1 = __importDefault(require("../models/reviewModel"));
 const eventModel_1 = __importDefault(require("../models/eventModel"));
@@ -67,9 +67,12 @@ const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.getEventById = getEventById;
-const functionTODO = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getEventByIdLike = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
-exports.functionTODO = functionTODO;
+exports.getEventByIdLike = getEventByIdLike;
+const getEventByIdComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+exports.getEventByIdComment = getEventByIdComment;
 const createMyEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Create My Event");
     const { ownerId, reviewId, title, description, location, type } = req.body;

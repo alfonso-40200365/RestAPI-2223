@@ -70,7 +70,11 @@ export const getEventById = async (req: Request, res: Response) => {
 }
     
 
-export const functionTODO = async (req: Request, res: Response) => {
+export const getEventByIdLike = async (req: Request, res: Response) => {
+
+}
+
+export const getEventByIdComment = async (req: Request, res: Response) => {
 
 }
 
