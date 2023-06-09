@@ -81,7 +81,6 @@ export const createMyEvent = async (req: AuthenticatedRequest, res: Response) =>
     const { authid, authtype, accessToken } = req.headers
     let { date } = req.body
 
-    console.log(accessToken)
 
     let event: IEvent | null
 
@@ -129,7 +128,9 @@ export const createMyEvent = async (req: AuthenticatedRequest, res: Response) =>
 export const getMyEvents = async (req: Request, res: Response) => {
     console.log("Get My Events")
 
-    const { authid, authtype } = req.headers
+    const { authid, authtype, accessToken } = req.headers
+
+    console.log(accessToken)
 
     try {
         if (!authid) {
