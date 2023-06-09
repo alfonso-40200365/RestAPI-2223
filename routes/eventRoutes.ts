@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express'
 import { AuthenticatedRequest } from '../models/Model'
-import { getEvents, getEventById, functionTODO, createMyEvent, getMyEvents, getMyEventById, updateMyEventById, deleteMyEventById } from '../controllers/eventController' 
+import { getEvents, getEventById, getEventByIdLike, getEventByIdComment, createMyEvent, getMyEvents, getMyEventById, updateMyEventById, deleteMyEventById } from '../controllers/eventController' 
 import { verifyToken } from '../controllers/authController'
 
 const router = express.Router() 
@@ -14,11 +14,11 @@ router.get('/myEvents/:id', (req: Request, res: Response, next: NextFunction) =>
 router.patch('/myEvents/:id',(req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => updateMyEventById(req as AuthenticatedRequest, res))
 
 router.delete('/myEvents/:id', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => deleteMyEventById(req as AuthenticatedRequest, res))
+//apagar event e review com eventId == id
 
 router.get('/', getEvents) 
 router.get('/:id', getEventById) 
-router.patch('/:id/like', functionTODO) 
-router.patch('/:id/comment', functionTODO) 
-//apagar event e review com eventId == id
+router.patch('/:id/like', getEventByIdLike) 
+router.patch('/:id/comment', getEventByIdComment) 
 
 export default router 
