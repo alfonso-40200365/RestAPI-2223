@@ -73,7 +73,7 @@ exports.functionTODO = functionTODO;
 const createMyEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Create My Event");
     const { ownerId, reviewId, title, description, location, type } = req.body;
-    const { authid, authtype } = req.headers;
+    const { authid, authtype, accessToken } = req.headers;
     let { date } = req.body;
     let event;
     // Se nao inserir uma data usar a data atual
@@ -110,7 +110,8 @@ const createMyEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 exports.createMyEvent = createMyEvent;
 const getMyEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Get My Events");
-    const { authid, authtype } = req.headers;
+    const { authid, authtype, authorization } = req.headers;
+    console.log(authorization);
     try {
         if (!authid) {
             return res.status(401).json({ message: 'Invalid credentials, You must be authenticated first' });

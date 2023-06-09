@@ -128,9 +128,9 @@ export const createMyEvent = async (req: AuthenticatedRequest, res: Response) =>
 export const getMyEvents = async (req: Request, res: Response) => {
     console.log("Get My Events")
 
-    const { authid, authtype, accessToken } = req.headers
+    const { authid, authtype, authorization } = req.headers
 
-    console.log(accessToken)
+    console.log(authorization)
 
     try {
         if (!authid) {
