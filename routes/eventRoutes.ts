@@ -9,7 +9,7 @@ const router = express.Router()
 
 router.post('/myEvents', (req: Request, res: Response) => createMyEvent(req as AuthenticatedRequest, res));
 
-router.get('/myEvents', verifyToken, getMyEvents)
+router.get('/myEvents', verifyToken)
 router.get('/myEvents/:id', verifyToken, getMyEventById)
 
 router.patch('/myEvents/:id', verifyToken, updateMyEventById)
