@@ -1,5 +1,5 @@
 import jwt, { Secret } from 'jsonwebtoken';
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import { connection } from '../database/provider'
 import bcrypt from 'bcryptjs'
 
@@ -69,12 +69,7 @@ export const createUser = async (req: Request, res: Response) => {
             return res.status(500).json({ message: 'Failed to create user' })
         }
 
-        const auth = {
-            userId: user.id,
-            userType: user.type
-        }
-
-        return res.status(201).json({ message: 'User created successful', auth })
+        return res.status(201).json({ message: 'User created successful' })
 
     } catch (error) {
         return res.status(500).json({ message: 'Oops! Something went wrong...' })
@@ -82,7 +77,7 @@ export const createUser = async (req: Request, res: Response) => {
 }
 
 
-export function verifyToken(req: Request, res: Response) {
+export function verifyToken(req: Request, res: Response, next: NextFunction) {
     console.log('Verify Token')
 
     const header = req.headers.authorization
@@ -101,6 +96,8 @@ export function verifyToken(req: Request, res: Response) {
     try {
         let decoded = jwt.verify(token, SECRET_KEY)
         console.log(decoded)
+
+        next()
 
     } catch (error: any) {
         if (error.name === 'TokenExpiredError')
