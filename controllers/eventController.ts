@@ -1,16 +1,74 @@
 import { Request, Response } from 'express'
 import { connection } from '../database/provider'
 
+import ReviewModel, { IReview } from '../models/reviewModel'
 import EventModel, { IEvent } from '../models/eventModel'
 import { AuthenticatedRequest } from '../models/Model'
 
 export const getEvents = async (req: Request, res: Response) => {
+    console.log("Get Events")
 
+    try {
+        const { date, type } = req.query
+        const filters: any = {}
+
+        if (typeof date === 'string') {
+            filters.date = { $gte: new Date(date) }
+        }
+
+        if (type) {
+            filters.type = type
+        }
+
+        const events = await EventModel(connection).find(filters)
+
+        if (!events || events.length === 0) {
+            return res.status(404).json({ message: 'No events found' })
+        }
+
+        return res.status(200).json({ message: 'Events retrieved successfully', events })
+
+    } catch (error) {
+        return res.status(500).json({ message: 'Oops! Something went wrong...' })
+    }
 }
 
 export const getEventById = async (req: Request, res: Response) => {
+    console.log('Get Event by ID')
 
+    const { id } = req.params
+
+    let event: IEvent | null
+    let review : IReview | null
+
+    try {
+        event = await EventModel(connection).findById(id)
+        review = await ReviewModel(connection).findOne({ eventId: id })
+
+        if (!event) {
+            return res.status(404).json({ message: `No event found for event: ${id}` })
+        }
+
+        event = {
+            id: event._id,
+            ownerId: event.ownerId,
+            reviewId: event.reviewId,
+            title: event.title,
+            description: event.description,
+            location: event.location,
+            date: event.date,
+            type: event.type
+        } as IEvent
+        
+        review = review ? review.transform() : null
+
+        return res.status(200).json({ message: 'Event retrieved successfully', event: event, review: review})
+        
+    } catch (error) {
+        return res.status(500).json({ message: 'Oops! Something went wrong...' })
+    }
 }
+    
 
 export const functionTODO = async (req: Request, res: Response) => {
 
@@ -38,7 +96,7 @@ export const createMyEvent = async (req: AuthenticatedRequest, res: Response) =>
 
         if (!authid) {
             return res.status(401).json({ message: 'Invalid credentials, You must be authenticated first' })
-        } 
+        }
 
         if (authtype !== "admin" && ownerId !== authid) {
             return res.status(403).json({ message: "You are not authorized to perform this request" })

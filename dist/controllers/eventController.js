@@ -14,11 +14,57 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteMyEventById = exports.updateMyEventById = exports.getMyEventById = exports.getMyEvents = exports.createMyEvent = exports.functionTODO = exports.getEventById = exports.getEvents = void 0;
 const provider_1 = require("../database/provider");
+const reviewModel_1 = __importDefault(require("../models/reviewModel"));
 const eventModel_1 = __importDefault(require("../models/eventModel"));
 const getEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("Get Events");
+    try {
+        const { date, type } = req.query;
+        const filters = {};
+        if (typeof date === 'string') {
+            filters.date = { $gte: new Date(date) };
+        }
+        if (type) {
+            filters.type = type;
+        }
+        const events = yield (0, eventModel_1.default)(provider_1.connection).find(filters);
+        if (!events || events.length === 0) {
+            return res.status(404).json({ message: 'No events found' });
+        }
+        return res.status(200).json({ message: 'Events retrieved successfully', events });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Oops! Something went wrong...' });
+    }
 });
 exports.getEvents = getEvents;
 const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('Get Event by ID');
+    const { id } = req.params;
+    let event;
+    let review;
+    try {
+        event = yield (0, eventModel_1.default)(provider_1.connection).findById(id);
+        review = yield (0, reviewModel_1.default)(provider_1.connection).findOne({ eventId: id });
+        if (!event) {
+            return res.status(404).json({ message: `No event found for event: ${id}` });
+        }
+        event = {
+            id: event._id,
+            ownerId: event.ownerId,
+            reviewId: event.reviewId,
+            title: event.title,
+            description: event.description,
+            location: event.location,
+            date: event.date,
+            type: event.type
+        };
+        review = review ? review.transform() : null;
+        return res.status(200).json({ message: 'Event retrieved successfully', event: event, review: review });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Oops! Something went wrong...' });
+    }
 });
 exports.getEventById = getEventById;
 const functionTODO = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
