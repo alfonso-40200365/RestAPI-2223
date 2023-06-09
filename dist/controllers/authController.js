@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createUser = exports.getUser = void 0;
+exports.verifyToken = exports.createUser = exports.getUser = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const provider_1 = require("../database/provider");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
@@ -75,3 +75,26 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.createUser = createUser;
+function verifyToken(req, res) {
+    const header = req.headers.authorization;
+    if (typeof header == 'undefined') {
+        return res.status(401).json({ message: 'No token provided!' });
+    }
+    let token, bearer = header.split(' ');
+    if (bearer.length == 2)
+        token = bearer[1];
+    else
+        token = header;
+    try {
+        let decoded = jsonwebtoken_1.default.verify(token, SECRET_KEY);
+        console.log(decoded);
+    }
+    catch (error) {
+        if (error.name === 'TokenExpiredError')
+            return res.status(401).json({ message: 'Whoops, your token has expired! Please login again.' });
+        if (error.name === 'JsonWebTokenError')
+            return res.status(401).json({ message: 'Malformed JWT' });
+        return res.status(401).json({ message: 'Unauthorized!' });
+    }
+}
+exports.verifyToken = verifyToken;

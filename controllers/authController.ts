@@ -30,8 +30,8 @@ export const getUser = async (req: Request, res: Response) => {
         if (!isPasswordValid) {
             return res.status(401).json({ message: 'Invalid password' })
         }
-    
-        const token = jwt.sign({userId: user.id, userType: user.type}, SECRET_KEY, {expiresIn: '2 days'})
+
+        const token = jwt.sign({ userId: user.id, userType: user.type }, SECRET_KEY, { expiresIn: '2 days' })
 
         return res.status(200).json({ message: 'Login successful', accessToken: token })
 
@@ -60,7 +60,7 @@ export const createUser = async (req: Request, res: Response) => {
             return res.status(409).json({ message: 'Username or E-mail already exists' })
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10) 
+        const hashedPassword = await bcrypt.hash(password, 10)
 
         user = await UserModel(connection)
             .create({ username, password: hashedPassword, email, verified: false, type })
@@ -79,4 +79,36 @@ export const createUser = async (req: Request, res: Response) => {
     } catch (error) {
         return res.status(500).json({ message: 'Oops! Something went wrong...' })
     }
+}
+
+
+export function verifyToken(req: Request, res: Response) {
+
+    const header = req.headers.authorization
+
+    if (typeof header == 'undefined') {
+        return res.status(401).json({ message: 'No token provided!' })
+    }
+
+    let token, bearer = header.split(' ')
+
+    if (bearer.length == 2)
+        token = bearer[1]
+    else
+        token = header
+
+    try {
+        let decoded = jwt.verify(token, SECRET_KEY)
+        console.log(decoded)
+
+    } catch (error: any) {
+        if (error.name === 'TokenExpiredError')
+            return res.status(401).json({ message: 'Whoops, your token has expired! Please login again.' });
+
+        if (error.name === 'JsonWebTokenError')
+            return res.status(401).json({ message: 'Malformed JWT' });
+
+        return res.status(401).json({ message: 'Unauthorized!' });
+    }
+
 }
