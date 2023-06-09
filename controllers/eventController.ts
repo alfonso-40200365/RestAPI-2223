@@ -32,9 +32,13 @@ export const createMyEvent = async (req: AuthenticatedRequest, res: Response) =>
     }
 
     try {
-        if (!ownerId || !title || !description || !location || !type || !authid || !authtype) {
+        if (!ownerId || !title || !description || !location || !type) {
             return res.status(400).json({ message: 'Please provide ownerId, title, description, location and type' })
         }
+
+        if (!authid) {
+            return res.status(401).json({ message: 'Invalid credentials, You must be authenticated first' })
+        } 
 
         if (authtype !== "admin" && ownerId !== authid) {
             return res.status(403).json({ message: "You are not authorized to perform this request" })
