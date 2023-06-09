@@ -64,21 +64,18 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         if (!user) {
             return res.status(500).json({ message: 'Failed to create user' });
         }
-        const auth = {
-            userId: user.id,
-            userType: user.type
-        };
-        return res.status(201).json({ message: 'User created successful', auth });
+        return res.status(201).json({ message: 'User created successful' });
     }
     catch (error) {
         return res.status(500).json({ message: 'Oops! Something went wrong...' });
     }
 });
 exports.createUser = createUser;
-function verifyToken(req, res) {
+function verifyToken(req, res, next) {
+    console.log('Verify Token');
     const header = req.headers.authorization;
     if (typeof header == 'undefined') {
-        return res.status(401).json({ message: 'No token provided!' });
+        return res.status(401).json({ message: 'Invalid credentials, You must be authenticated first!' });
     }
     let token, bearer = header.split(' ');
     if (bearer.length == 2)
@@ -87,7 +84,9 @@ function verifyToken(req, res) {
         token = header;
     try {
         let decoded = jsonwebtoken_1.default.verify(token, SECRET_KEY);
-        console.log(decoded);
+        req.userId = decoded.userId;
+        req.userType = decoded.userType;
+        next();
     }
     catch (error) {
         if (error.name === 'TokenExpiredError')

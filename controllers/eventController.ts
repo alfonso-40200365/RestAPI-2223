@@ -78,9 +78,10 @@ export const createMyEvent = async (req: AuthenticatedRequest, res: Response) =>
     console.log("Create My Event")
 
     const { ownerId, reviewId, title, description, location, type } = req.body
-    const { authid, authtype, accessToken } = req.headers
-    let { date } = req.body
+    const authId = req.userId
+    const authType = req.userType
 
+    let { date } = req.body
 
     let event: IEvent | null
 
@@ -95,11 +96,11 @@ export const createMyEvent = async (req: AuthenticatedRequest, res: Response) =>
             return res.status(400).json({ message: 'Please provide ownerId, title, description, location and type' })
         }
 
-        if (!authid) {
+        if (!authId) {
             return res.status(401).json({ message: 'Invalid credentials, You must be authenticated first' })
         }
 
-        if (authtype !== "admin" && ownerId !== authid) {
+        if (authType !== "admin" && ownerId !== authId) {
             return res.status(403).json({ message: "You are not authorized to perform this request" })
         }
 
@@ -125,30 +126,25 @@ export const createMyEvent = async (req: AuthenticatedRequest, res: Response) =>
 
 }
 
-export const getMyEvents = async (req: Request, res: Response) => {
+export const getMyEvents = async (req: AuthenticatedRequest, res: Response) => {
     console.log("Get My Events")
 
-    const { authid, authtype, authorization } = req.headers
-
-    console.log(authorization)
+    const authId = req.userId
+    const authType = req.userType
 
     try {
-        if (!authid) {
-            return res.status(401).json({ message: 'Invalid credentials, You must be authenticated first' })
-        }
-
-        if (authtype == "student") {
+        if (authType == "student") {
             return res.status(403).json({ message: 'Your not allowed to perform this request' })
         }
 
         const events = await EventModel(connection)
-            .find({ ownerId: authid })
+            .find({ ownerId: authId })
 
         if (!events || events.length === 0) {
-            return res.status(404).json({ message: `No events found for owner: ${authid}` })
+            return res.status(404).json({ message: `No events found for owner: ${authId}` })
         }
 
-        return res.status(200).json({ message: `Events of owner: ${authid}`, events })
+        return res.status(200).json({ message: `Events of owner: ${authId}`, events })
 
     } catch (error) {
         return res.status(500).json({ message: 'Oops! Something went wrong...' })

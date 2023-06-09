@@ -1,6 +1,7 @@
 import jwt, { Secret } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express'
 import { connection } from '../database/provider'
+import { AuthenticatedRequest } from '../models/Model'
 import bcrypt from 'bcryptjs'
 
 import UserModel, { IUser } from '../models/userModel'
@@ -77,13 +78,13 @@ export const createUser = async (req: Request, res: Response) => {
 }
 
 
-export function verifyToken(req: Request, res: Response, next: NextFunction) {
+export function verifyToken(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     console.log('Verify Token')
 
     const header = req.headers.authorization
 
     if (typeof header == 'undefined') {
-        return res.status(401).json({ message: 'No token provided!' })
+        return res.status(401).json({ message: 'Invalid credentials, You must be authenticated first!' })
     }
 
     let token, bearer = header.split(' ')
@@ -94,8 +95,10 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
         token = header
 
     try {
-        let decoded = jwt.verify(token, SECRET_KEY)
-        console.log(decoded)
+        let decoded: any = jwt.verify(token, SECRET_KEY)
+
+        req.userId = decoded.userId
+        req.userType = decoded.userType
 
         next()
 

@@ -5,15 +5,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const eventController_1 = require("../controllers/eventController");
+const authController_1 = require("../controllers/authController");
 const router = express_1.default.Router();
-router.post('/myEvents', (req, res) => (0, eventController_1.createMyEvent)(req, res));
-router.get('/myEvents', eventController_1.getMyEvents);
-router.get('/myEvents/:id', eventController_1.getMyEventById);
-router.patch('/myEvents/:id', eventController_1.updateMyEventById);
-router.delete('/myEvents/:id', eventController_1.deleteMyEventById);
+router.post('/myEvents', (req, res, next) => (0, authController_1.verifyToken)(req, res, next), (req, res) => (0, eventController_1.createMyEvent)(req, res));
+router.get('/myEvents', (req, res, next) => (0, authController_1.verifyToken)(req, res, next), (req, res) => (0, eventController_1.getMyEvents)(req, res));
+router.get('/myEvents/:id', (req, res, next) => (0, authController_1.verifyToken)(req, res, next), (req, res) => (0, eventController_1.getMyEventById)(req, res));
+router.patch('/myEvents/:id', (req, res, next) => (0, authController_1.verifyToken)(req, res, next), (req, res) => (0, eventController_1.updateMyEventById)(req, res));
+router.delete('/myEvents/:id', (req, res, next) => (0, authController_1.verifyToken)(req, res, next), (req, res) => (0, eventController_1.deleteMyEventById)(req, res));
 router.get('/', eventController_1.getEvents);
 router.get('/:id', eventController_1.getEventById);
 router.patch('/:id/like', eventController_1.functionTODO);
 router.patch('/:id/comment', eventController_1.functionTODO);
-//apagar event e review
+//apagar event e review com eventId == id
 exports.default = router;
