@@ -86,9 +86,6 @@ const createMyEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         if (!ownerId || !title || !description || !location || !type) {
             return res.status(400).json({ message: 'Please provide ownerId, title, description, location and type' });
         }
-        if (!authId) {
-            return res.status(401).json({ message: 'Invalid credentials, You must be authenticated first' });
-        }
         if (authType !== "admin" && ownerId !== authId) {
             return res.status(403).json({ message: "You are not authorized to perform this request" });
         }

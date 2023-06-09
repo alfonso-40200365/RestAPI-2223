@@ -77,7 +77,6 @@ export const createUser = async (req: Request, res: Response) => {
     }
 }
 
-
 export function verifyToken(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     console.log('Verify Token')
 
