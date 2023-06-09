@@ -1,8 +1,11 @@
+import jwt, { Secret } from 'jsonwebtoken';
 import { Request, Response } from 'express'
 import { connection } from '../database/provider'
-import bcrypt from 'bcryptjs' 
+import bcrypt from 'bcryptjs'
 
 import UserModel, { IUser } from '../models/userModel'
+
+const SECRET_KEY: Secret = process.env.SECRET_KEY as string
 
 export const getUser = async (req: Request, res: Response) => {
     console.log("Get User")
@@ -27,13 +30,10 @@ export const getUser = async (req: Request, res: Response) => {
         if (!isPasswordValid) {
             return res.status(401).json({ message: 'Invalid password' })
         }
-        
-        const auth = {
-            userId: user.id,
-            userType: user.type
-        }
+    
+        const token = jwt.sign({userId: user.id, userType: user.type}, SECRET_KEY, {expiresIn: '2 days'})
 
-        return res.status(200).json({ message: 'Login successful', auth })
+        return res.status(200).json({ message: 'Login successful', accessToken: token })
 
     } catch (error) {
         return res.status(500).json({ message: 'Oops! Something went wrong...' })
@@ -61,7 +61,6 @@ export const createUser = async (req: Request, res: Response) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10) 
-        console.log(hashedPassword)
 
         user = await UserModel(connection)
             .create({ username, password: hashedPassword, email, verified: false, type })
@@ -81,4 +80,3 @@ export const createUser = async (req: Request, res: Response) => {
         return res.status(500).json({ message: 'Oops! Something went wrong...' })
     }
 }
-

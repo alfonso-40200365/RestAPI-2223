@@ -44,7 +44,7 @@ const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     let event;
     let review;
     try {
-        event = yield (0, eventModel_1.default)(provider_1.connection).findById(id);
+        event = yield (0, eventModel_1.default)(provider_1.connection).findById(id).exec();
         review = yield (0, reviewModel_1.default)(provider_1.connection).findOne({ eventId: id });
         if (!event) {
             return res.status(404).json({ message: `No event found for event: ${id}` });

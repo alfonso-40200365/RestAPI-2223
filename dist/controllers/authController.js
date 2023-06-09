@@ -13,9 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createUser = exports.getUser = void 0;
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const provider_1 = require("../database/provider");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const userModel_1 = __importDefault(require("../models/userModel"));
+const SECRET_KEY = process.env.SECRET_KEY;
 const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Get User");
     const { username, password } = req.body;
@@ -34,11 +36,8 @@ const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (!isPasswordValid) {
             return res.status(401).json({ message: 'Invalid password' });
         }
-        const auth = {
-            userId: user.id,
-            userType: user.type
-        };
-        return res.status(200).json({ message: 'Login successful', auth });
+        const token = jsonwebtoken_1.default.sign({ userId: user.id, userType: user.type }, SECRET_KEY, { expiresIn: '2 days' });
+        return res.status(200).json({ message: 'Login successful', accessToken: token });
     }
     catch (error) {
         return res.status(500).json({ message: 'Oops! Something went wrong...' });
@@ -60,7 +59,6 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             return res.status(409).json({ message: 'Username or E-mail already exists' });
         }
         const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
-        console.log(hashedPassword);
         user = yield (0, userModel_1.default)(provider_1.connection)
             .create({ username, password: hashedPassword, email, verified: false, type });
         if (!user) {

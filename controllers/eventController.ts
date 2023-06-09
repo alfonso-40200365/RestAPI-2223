@@ -42,7 +42,7 @@ export const getEventById = async (req: Request, res: Response) => {
     let review : IReview | null
 
     try {
-        event = await EventModel(connection).findById(id)
+        event = await EventModel(connection).findById(id).exec()
         review = await ReviewModel(connection).findOne({ eventId: id })
 
         if (!event) {
@@ -63,7 +63,7 @@ export const getEventById = async (req: Request, res: Response) => {
         review = review ? review.transform() : null
 
         return res.status(200).json({ message: 'Event retrieved successfully', event: event, review: review})
-        
+
     } catch (error) {
         return res.status(500).json({ message: 'Oops! Something went wrong...' })
     }

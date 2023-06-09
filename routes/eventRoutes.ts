@@ -5,7 +5,7 @@ import { getEvents, getEventById, functionTODO, createMyEvent, getMyEvents, getM
 const router = express.Router() 
 
 router.get('/', getEvents) 
-router.patch('/:id', getEventById) 
+router.get('/:id', getEventById) 
 router.patch('/:id/like', functionTODO) 
 router.patch('/:id/comment', functionTODO) 
 
@@ -17,5 +17,6 @@ router.get('/myEvents/:id', getMyEventById)
 router.patch('/myEvents/:id', updateMyEventById)
 
 router.delete('/myEvents/:id', deleteMyEventById)
+//apagar event e review
 
 export default router 
