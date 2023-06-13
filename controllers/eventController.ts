@@ -48,17 +48,6 @@ export const getEventById = async (req: Request, res: Response) => {
         if (!event) {
             return res.status(404).json({ message: `No event found for event: ${id}` })
         }
-
-        event = {
-            id: event._id,
-            ownerId: event.ownerId,
-            reviewId: event.reviewId,
-            title: event.title,
-            description: event.description,
-            location: event.location,
-            date: event.date,
-            type: event.type
-        } as IEvent
         
         review = review ? review.transform() : null
 
@@ -151,7 +140,34 @@ export const getMyEvents = async (req: AuthenticatedRequest, res: Response) => {
     }
 }
 
-export const getMyEventById = async (req: Request, res: Response) => {
+export const getMyEventById = async (req: AuthenticatedRequest, res: Response) => {
+    console.log("Get My Event by ID")
+
+    const authId = req.userId
+    const authType = req.userType
+
+    const { id } = req.params
+
+    let event: IEvent | null
+    let review : IReview | null
+
+    try {
+        if (authType == "student" || (authId !== id && authType !== "admin") ) {
+            return res.status(403).json({ message: 'Your not allowed to perform this request' })
+        }
+
+        event = await EventModel(connection).findById(id).exec()
+        review = await ReviewModel(connection).findOne({ eventId: id })
+
+        if (!event) {
+            return res.status(404).json({ message: `No event found for event: ${id}` })
+        }
+
+        return res.status(200).json({ message: 'Event retrieved successfully', event: event, review: review})
+
+    } catch (error) {
+        return res.status(500).json({ message: 'Oops! Something went wrong...' })
+    }
 
 }
 

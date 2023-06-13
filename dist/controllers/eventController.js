@@ -49,16 +49,6 @@ const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (!event) {
             return res.status(404).json({ message: `No event found for event: ${id}` });
         }
-        event = {
-            id: event._id,
-            ownerId: event.ownerId,
-            reviewId: event.reviewId,
-            title: event.title,
-            description: event.description,
-            location: event.location,
-            date: event.date,
-            type: event.type
-        };
         review = review ? review.transform() : null;
         return res.status(200).json({ message: 'Event retrieved successfully', event: event, review: review });
     }
@@ -130,6 +120,26 @@ const getMyEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.getMyEvents = getMyEvents;
 const getMyEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("Get My Event by ID");
+    const authId = req.userId;
+    const authType = req.userType;
+    const { id } = req.params;
+    let event;
+    let review;
+    try {
+        if (authType == "student" || (authId !== id && authType !== "admin")) {
+            return res.status(403).json({ message: 'Your not allowed to perform this request' });
+        }
+        event = yield (0, eventModel_1.default)(provider_1.connection).findById(id).exec();
+        review = yield (0, reviewModel_1.default)(provider_1.connection).findOne({ eventId: id });
+        if (!event) {
+            return res.status(404).json({ message: `No event found for event: ${id}` });
+        }
+        return res.status(200).json({ message: 'Event retrieved successfully', event: event, review: review });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Oops! Something went wrong...' });
+    }
 });
 exports.getMyEventById = getMyEventById;
 const updateMyEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
