@@ -123,7 +123,7 @@ export const getEventByIdLike = async (req: AuthenticatedRequest, res: Response)
         return res.status(200).json({ message: 'Review created and liked successfully' })
 
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' })
+        return res.status(500).json({ message: 'Oops! Something went wrong...' })
     }
 }
 
@@ -175,7 +175,7 @@ export const getEventByIdComment = async (req: AuthenticatedRequest, res: Respon
         return res.status(200).json({ message: 'Review created and comment added successfully' })
 
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' })
+        return res.status(500).json({ message: 'Oops! Something went wrong...' })
     }
 }
 

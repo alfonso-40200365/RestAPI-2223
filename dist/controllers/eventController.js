@@ -104,7 +104,7 @@ const getEventByIdLike = (req, res) => __awaiter(void 0, void 0, void 0, functio
         return res.status(200).json({ message: 'Review created and liked successfully' });
     }
     catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: 'Oops! Something went wrong...' });
     }
 });
 exports.getEventByIdLike = getEventByIdLike;
@@ -142,7 +142,7 @@ const getEventByIdComment = (req, res) => __awaiter(void 0, void 0, void 0, func
         return res.status(200).json({ message: 'Review created and comment added successfully' });
     }
     catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: 'Oops! Something went wrong...' });
     }
 });
 exports.getEventByIdComment = getEventByIdComment;
