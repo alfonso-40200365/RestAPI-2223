@@ -47,7 +47,7 @@ const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         event = yield (0, eventModel_1.default)(provider_1.connection).findById(id).exec();
         review = yield (0, reviewModel_1.default)(provider_1.connection).findOne({ eventId: id });
         if (!event) {
-            return res.status(404).json({ message: `No event found for event: ${id}` });
+            return res.status(404).json({ message: `No event found for id: ${id}` });
         }
         review = review ? review.transform() : null;
         return res.status(200).json({ message: 'Event retrieved successfully', event: event, review: review });
@@ -58,9 +58,92 @@ const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.getEventById = getEventById;
 const getEventByIdLike = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('Get Event by ID and Like');
+    const authId = req.userId;
+    const { id } = req.params;
+    let event;
+    let review;
+    try {
+        event = yield (0, eventModel_1.default)(provider_1.connection).findById(id).exec();
+        if (!event) {
+            return res.status(404).json({ message: `No event found for id: ${id}` });
+        }
+        if (event.reviewId) {
+            review = yield (0, reviewModel_1.default)(provider_1.connection).findById(event.reviewId).exec();
+            if (!review) {
+                return res.status(404).json({ message: 'Review not found' });
+            }
+            const userLikeIndex = review.likes.findIndex((like) => like.userId === authId);
+            if (userLikeIndex !== -1) {
+                const userLike = review.likes[userLikeIndex];
+                if (userLike.like === true) {
+                    userLike.like = false;
+                    yield review.save();
+                    return res.status(200).json({ message: 'Review like updated to false' });
+                }
+                else {
+                    userLike.like = true;
+                    yield review.save();
+                    return res.status(200).json({ message: 'Review liked successfully' });
+                }
+            }
+            review.likes.push({ userId: authId, like: true });
+            yield review.save();
+            return res.status(200).json({ message: 'Review liked successfully' });
+        }
+        const reviewArgs = {
+            ratings: [],
+            comments: [],
+            likes: [{ userId: authId, like: true }]
+        };
+        review = yield (0, reviewModel_1.default)(provider_1.connection)
+            .create(reviewArgs);
+        review.transform();
+        event.reviewId = review.id;
+        yield event.save();
+        return res.status(200).json({ message: 'Review created and liked successfully' });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
 });
 exports.getEventByIdLike = getEventByIdLike;
 const getEventByIdComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('Get Event by ID and Comment');
+    const authId = req.userId;
+    const { id } = req.params;
+    const { comment } = req.body;
+    let event;
+    let review;
+    try {
+        event = yield (0, eventModel_1.default)(provider_1.connection).findById(id).exec();
+        if (!event) {
+            return res.status(404).json({ message: `No event found for id: ${id}` });
+        }
+        if (event.reviewId) {
+            review = yield (0, reviewModel_1.default)(provider_1.connection).findById(event.reviewId).exec();
+            if (!review) {
+                return res.status(404).json({ message: 'Review not found' });
+            }
+            review.comments.push({ userId: authId, comment, timeStamp: new Date() });
+            yield review.save();
+            return res.status(200).json({ message: 'Comment added successfully' });
+        }
+        const reviewArgs = {
+            ratings: [],
+            comments: [{ userId: authId, comment, timeStamp: new Date() }],
+            likes: []
+        };
+        review = yield (0, reviewModel_1.default)(provider_1.connection)
+            .create(reviewArgs);
+        review.transform();
+        event.reviewId = review.id;
+        yield event.save();
+        return res.status(200).json({ message: 'Review created and comment added successfully' });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
 });
 exports.getEventByIdComment = getEventByIdComment;
 const createMyEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

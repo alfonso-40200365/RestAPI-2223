@@ -8,6 +8,7 @@ interface Rating {
 interface Comment {
     userId: string
     comment: string
+    timeStamp: Date
 }
 
 interface Like {
@@ -31,6 +32,7 @@ const ratingSchema: mongoose.SchemaDefinition = {
 const commentSchema: mongoose.SchemaDefinition = {
     userId: { type: mongoose.SchemaTypes.String, required: true },
     comment: { type: mongoose.SchemaTypes.String, required: true },
+    timeStamp: {type: mongoose.SchemaTypes.Date, required: true },
 }
 
 const likeSchema: mongoose.SchemaDefinition = {

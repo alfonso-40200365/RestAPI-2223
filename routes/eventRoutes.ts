@@ -9,7 +9,7 @@ const router = express.Router()
 router.post('/myEvents', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => createMyEvent(req as AuthenticatedRequest, res)) // --Done
 
 router.get('/myEvents', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => getMyEvents(req as AuthenticatedRequest, res)) // --Done
-router.get('/myEvents/:id', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => getMyEventById(req as AuthenticatedRequest, res)) // -Done
+router.get('/myEvents/:id', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => getMyEventById(req as AuthenticatedRequest, res)) // --Done
 
 router.patch('/myEvents/:id',(req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => updateMyEventById(req as AuthenticatedRequest, res))
 
@@ -18,7 +18,7 @@ router.delete('/myEvents/:id', (req: Request, res: Response, next: NextFunction)
 
 router.get('/', getEvents) // --Done
 router.get('/:id', getEventById) // --Done
-router.patch('/:id/like', getEventByIdLike) 
-router.patch('/:id/comment', getEventByIdComment) 
+router.patch('/:id/like', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => getEventByIdLike(req as AuthenticatedRequest, res)) // --Done
+router.patch('/:id/comment', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => getEventByIdComment(req as AuthenticatedRequest, res)) 
 
 export default router 

@@ -11,6 +11,7 @@ const ratingSchema = {
 const commentSchema = {
     userId: { type: mongoose_1.default.SchemaTypes.String, required: true },
     comment: { type: mongoose_1.default.SchemaTypes.String, required: true },
+    timeStamp: { type: mongoose_1.default.SchemaTypes.Date, required: true },
 };
 const likeSchema = {
     userId: { type: mongoose_1.default.SchemaTypes.String, required: true },

@@ -39,33 +39,146 @@ export const getEventById = async (req: Request, res: Response) => {
     const { id } = req.params
 
     let event: IEvent | null
-    let review : IReview | null
+    let review: IReview | null
 
     try {
         event = await EventModel(connection).findById(id).exec()
         review = await ReviewModel(connection).findOne({ eventId: id })
 
         if (!event) {
-            return res.status(404).json({ message: `No event found for event: ${id}` })
+            return res.status(404).json({ message: `No event found for id: ${id}` })
         }
-        
+
         review = review ? review.transform() : null
 
-        return res.status(200).json({ message: 'Event retrieved successfully', event: event, review: review})
+        return res.status(200).json({ message: 'Event retrieved successfully', event: event, review: review })
 
     } catch (error) {
         return res.status(500).json({ message: 'Oops! Something went wrong...' })
     }
 }
-    
 
-export const getEventByIdLike = async (req: Request, res: Response) => {
 
+export const getEventByIdLike = async (req: AuthenticatedRequest, res: Response) => {
+    console.log('Get Event by ID and Like')
+
+    const authId = req.userId
+
+    const { id } = req.params
+
+    let event: IEvent | null
+    let review: IReview | null
+
+    try {
+        event = await EventModel(connection).findById(id).exec()
+
+        if (!event) {
+            return res.status(404).json({ message: `No event found for id: ${id}` })
+        }
+
+        if (event.reviewId) {
+            review = await ReviewModel(connection).findById(event.reviewId).exec()
+
+            if (!review) {
+                return res.status(404).json({ message: 'Review not found' })
+            }
+
+            const userLikeIndex = review.likes.findIndex((like) => like.userId === authId)
+
+            if (userLikeIndex !== -1) {
+                const userLike = review.likes[userLikeIndex]
+                if (userLike.like === true) {
+                    userLike.like = false
+
+                    await review.save()
+                    return res.status(200).json({ message: 'Review like updated to false' })
+                } else {
+                    userLike.like = true
+
+                    await review.save()
+                    return res.status(200).json({ message: 'Review liked successfully' })
+                }
+            }
+
+            review.likes.push({ userId: authId, like: true })
+            await review.save()
+
+            return res.status(200).json({ message: 'Review liked successfully' })
+        }
+
+        const reviewArgs = {
+            ratings: [],
+            comments: [],
+            likes: [{ userId: authId, like: true }]
+        }
+
+        review = await ReviewModel(connection)
+            .create(reviewArgs)
+
+        review.transform()
+
+        event.reviewId = review.id
+        await event.save()
+
+        return res.status(200).json({ message: 'Review created and liked successfully' })
+
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' })
+    }
 }
 
-export const getEventByIdComment = async (req: Request, res: Response) => {
+export const getEventByIdComment = async (req: AuthenticatedRequest, res: Response) => {
+    console.log('Get Event by ID and Comment')
 
+    const authId = req.userId
+
+    const { id } = req.params
+    const { comment } = req.body
+
+    let event: IEvent | null
+    let review: IReview | null
+
+    try {
+        event = await EventModel(connection).findById(id).exec()
+
+        if (!event) {
+            return res.status(404).json({ message: `No event found for id: ${id}` })
+        }
+
+        if (event.reviewId) {
+            review = await ReviewModel(connection).findById(event.reviewId).exec()
+
+            if (!review) {
+                return res.status(404).json({ message: 'Review not found' })
+            }
+
+            review.comments.push({ userId: authId, comment, timeStamp: new Date() })
+            await review.save()
+
+            return res.status(200).json({ message: 'Comment added successfully' })
+        }
+
+        const reviewArgs = {
+            ratings: [],
+            comments: [{ userId: authId, comment, timeStamp: new Date() }],
+            likes: []
+        }
+
+        review = await ReviewModel(connection)
+            .create(reviewArgs)
+
+        review.transform()
+
+        event.reviewId = review.id
+        await event.save()
+
+        return res.status(200).json({ message: 'Review created and comment added successfully' })
+
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' })
+    }
 }
+
 
 export const createMyEvent = async (req: AuthenticatedRequest, res: Response) => {
     console.log("Create My Event")
@@ -149,10 +262,10 @@ export const getMyEventById = async (req: AuthenticatedRequest, res: Response) =
     const { id } = req.params
 
     let event: IEvent | null
-    let review : IReview | null
+    let review: IReview | null
 
     try {
-        if (authType == "student" || (authId !== id && authType !== "admin") ) {
+        if (authType == "student" || (authId !== id && authType !== "admin")) {
             return res.status(403).json({ message: 'Your not allowed to perform this request' })
         }
 
@@ -163,7 +276,7 @@ export const getMyEventById = async (req: AuthenticatedRequest, res: Response) =
             return res.status(404).json({ message: `No event found for event: ${id}` })
         }
 
-        return res.status(200).json({ message: 'Event retrieved successfully', event: event, review: review})
+        return res.status(200).json({ message: 'Event retrieved successfully', event: event, review: review })
 
     } catch (error) {
         return res.status(500).json({ message: 'Oops! Something went wrong...' })
