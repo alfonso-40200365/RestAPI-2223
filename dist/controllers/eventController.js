@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -47,7 +58,7 @@ const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         event = yield (0, eventModel_1.default)(provider_1.connection).findById(id).exec();
         review = yield (0, reviewModel_1.default)(provider_1.connection).findOne({ eventId: id });
         if (!event) {
-            return res.status(404).json({ message: `No event found for id: ${id}` });
+            return res.status(404).json({ message: `No event found for ID: ${id}` });
         }
         review = review ? review.transform() : null;
         return res.status(200).json({ message: 'Event retrieved successfully', event: event, review: review });
@@ -66,7 +77,7 @@ const getEventByIdLike = (req, res) => __awaiter(void 0, void 0, void 0, functio
     try {
         event = yield (0, eventModel_1.default)(provider_1.connection).findById(id).exec();
         if (!event) {
-            return res.status(404).json({ message: `No event found for id: ${id}` });
+            return res.status(404).json({ message: `No event found for ID: ${id}` });
         }
         if (event.reviewId) {
             review = yield (0, reviewModel_1.default)(provider_1.connection).findById(event.reviewId).exec();
@@ -79,17 +90,17 @@ const getEventByIdLike = (req, res) => __awaiter(void 0, void 0, void 0, functio
                 if (userLike.like === true) {
                     userLike.like = false;
                     yield review.save();
-                    return res.status(200).json({ message: 'Review like updated to false' });
+                    return res.status(200).json({ message: 'Review like updated to false', review: review.id });
                 }
                 else {
                     userLike.like = true;
                     yield review.save();
-                    return res.status(200).json({ message: 'Review liked successfully' });
+                    return res.status(200).json({ message: 'Review liked successfully', review: review.id });
                 }
             }
             review.likes.push({ userId: authId, like: true });
             yield review.save();
-            return res.status(200).json({ message: 'Review liked successfully' });
+            return res.status(200).json({ message: 'Review liked successfully', review: review.id });
         }
         const reviewArgs = {
             ratings: [],
@@ -101,7 +112,7 @@ const getEventByIdLike = (req, res) => __awaiter(void 0, void 0, void 0, functio
         review.transform();
         event.reviewId = review.id;
         yield event.save();
-        return res.status(200).json({ message: 'Review created and liked successfully' });
+        return res.status(200).json({ message: 'Review created and liked successfully', review: review.id });
     }
     catch (error) {
         return res.status(500).json({ message: 'Oops! Something went wrong...' });
@@ -118,28 +129,34 @@ const getEventByIdComment = (req, res) => __awaiter(void 0, void 0, void 0, func
     try {
         event = yield (0, eventModel_1.default)(provider_1.connection).findById(id).exec();
         if (!event) {
-            return res.status(404).json({ message: `No event found for id: ${id}` });
+            return res.status(404).json({ message: `No event found for ID: ${id}` });
         }
         if (event.reviewId) {
             review = yield (0, reviewModel_1.default)(provider_1.connection).findById(event.reviewId).exec();
             if (!review) {
                 return res.status(404).json({ message: 'Review not found' });
             }
-            review.comments.push({ userId: authId, comment, timeStamp: new Date() });
+            if (!comment) {
+                return res.status(400).json({ message: 'Please provide comment' });
+            }
+            review.comments.push({
+                userId: authId,
+                comment,
+                timeStamp: new Date()
+            });
             yield review.save();
-            return res.status(200).json({ message: 'Comment added successfully' });
+            return res.status(200).json({ message: 'Comment added successfully', review: review.id });
         }
         const reviewArgs = {
             ratings: [],
             comments: [{ userId: authId, comment, timeStamp: new Date() }],
             likes: []
         };
-        review = yield (0, reviewModel_1.default)(provider_1.connection)
-            .create(reviewArgs);
+        review = yield (0, reviewModel_1.default)(provider_1.connection).create(reviewArgs);
         review.transform();
         event.reviewId = review.id;
         yield event.save();
-        return res.status(200).json({ message: 'Review created and comment added successfully' });
+        return res.status(200).json({ message: 'Review created and comment added successfully', review: review.id });
     }
     catch (error) {
         return res.status(500).json({ message: 'Oops! Something went wrong...' });
@@ -216,7 +233,7 @@ const getMyEventById = (req, res) => __awaiter(void 0, void 0, void 0, function*
         event = yield (0, eventModel_1.default)(provider_1.connection).findById(id).exec();
         review = yield (0, reviewModel_1.default)(provider_1.connection).findOne({ eventId: id });
         if (!event) {
-            return res.status(404).json({ message: `No event found for event: ${id}` });
+            return res.status(404).json({ message: `No event found for ID: ${id}` });
         }
         return res.status(200).json({ message: 'Event retrieved successfully', event: event, review: review });
     }
@@ -226,8 +243,45 @@ const getMyEventById = (req, res) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.getMyEventById = getMyEventById;
 const updateMyEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('Update My Event by ID');
+    const { id } = req.params;
+    const _a = req.body, { ownerId, reviewId } = _a, updatedFields = __rest(_a, ["ownerId", "reviewId"]);
+    const authId = req.userId;
+    const authType = req.userType;
+    try {
+        if (authType == "student" || (authId !== id && authType !== "admin")) {
+            return res.status(403).json({ message: 'Your not allowed to perform this request' });
+        }
+        const event = yield (0, eventModel_1.default)(provider_1.connection).findByIdAndUpdate(id, updatedFields, { new: true }).exec();
+        if (!event) {
+            return res.status(404).json({ message: `No event found for ID: ${id}` });
+        }
+        return res.status(200).json({ message: 'Event updated successfully', event: event });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Oops! Something went wrong...' });
+    }
 });
 exports.updateMyEventById = updateMyEventById;
 const deleteMyEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("Delete My Event by ID");
+    const authId = req.userId;
+    const authType = req.userType;
+    const { id } = req.params;
+    let event;
+    try {
+        if (authType == "student" || (authId !== id && authType !== "admin")) {
+            return res.status(403).json({ message: 'Your not allowed to perform this request' });
+        }
+        event = yield (0, eventModel_1.default)(provider_1.connection).findByIdAndDelete(id).exec();
+        yield (0, reviewModel_1.default)(provider_1.connection).findOneAndDelete({ eventId: id });
+        if (!event) {
+            return res.status(404).json({ message: `No event found for ID: ${id}` });
+        }
+        return res.status(200).json({ message: 'Event and Reviews deleted successfully' });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Oops! Something went wrong...' });
+    }
 });
 exports.deleteMyEventById = deleteMyEventById;

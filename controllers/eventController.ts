@@ -46,7 +46,7 @@ export const getEventById = async (req: Request, res: Response) => {
         review = await ReviewModel(connection).findOne({ eventId: id })
 
         if (!event) {
-            return res.status(404).json({ message: `No event found for id: ${id}` })
+            return res.status(404).json({ message: `No event found for ID: ${id}` })
         }
 
         review = review ? review.transform() : null
@@ -57,7 +57,6 @@ export const getEventById = async (req: Request, res: Response) => {
         return res.status(500).json({ message: 'Oops! Something went wrong...' })
     }
 }
-
 
 export const getEventByIdLike = async (req: AuthenticatedRequest, res: Response) => {
     console.log('Get Event by ID and Like')
@@ -73,7 +72,7 @@ export const getEventByIdLike = async (req: AuthenticatedRequest, res: Response)
         event = await EventModel(connection).findById(id).exec()
 
         if (!event) {
-            return res.status(404).json({ message: `No event found for id: ${id}` })
+            return res.status(404).json({ message: `No event found for ID: ${id}` })
         }
 
         if (event.reviewId) {
@@ -91,19 +90,19 @@ export const getEventByIdLike = async (req: AuthenticatedRequest, res: Response)
                     userLike.like = false
 
                     await review.save()
-                    return res.status(200).json({ message: 'Review like updated to false' })
+                    return res.status(200).json({ message: 'Review like updated to false', review: review.id })
                 } else {
                     userLike.like = true
 
                     await review.save()
-                    return res.status(200).json({ message: 'Review liked successfully' })
+                    return res.status(200).json({ message: 'Review liked successfully', review: review.id })
                 }
             }
 
             review.likes.push({ userId: authId, like: true })
             await review.save()
 
-            return res.status(200).json({ message: 'Review liked successfully' })
+            return res.status(200).json({ message: 'Review liked successfully', review: review.id })
         }
 
         const reviewArgs = {
@@ -120,7 +119,7 @@ export const getEventByIdLike = async (req: AuthenticatedRequest, res: Response)
         event.reviewId = review.id
         await event.save()
 
-        return res.status(200).json({ message: 'Review created and liked successfully' })
+        return res.status(200).json({ message: 'Review created and liked successfully', review: review.id })
 
     } catch (error) {
         return res.status(500).json({ message: 'Oops! Something went wrong...' })
@@ -142,7 +141,7 @@ export const getEventByIdComment = async (req: AuthenticatedRequest, res: Respon
         event = await EventModel(connection).findById(id).exec()
 
         if (!event) {
-            return res.status(404).json({ message: `No event found for id: ${id}` })
+            return res.status(404).json({ message: `No event found for ID: ${id}` })
         }
 
         if (event.reviewId) {
@@ -152,10 +151,19 @@ export const getEventByIdComment = async (req: AuthenticatedRequest, res: Respon
                 return res.status(404).json({ message: 'Review not found' })
             }
 
-            review.comments.push({ userId: authId, comment, timeStamp: new Date() })
+            if (!comment) {
+                return res.status(400).json({ message: 'Please provide comment' })
+            }
+
+            review.comments.push({
+                userId: authId,
+                comment,
+                timeStamp: new Date()
+            })
+
             await review.save()
 
-            return res.status(200).json({ message: 'Comment added successfully' })
+            return res.status(200).json({ message: 'Comment added successfully', review: review.id })
         }
 
         const reviewArgs = {
@@ -164,21 +172,19 @@ export const getEventByIdComment = async (req: AuthenticatedRequest, res: Respon
             likes: []
         }
 
-        review = await ReviewModel(connection)
-            .create(reviewArgs)
+        review = await ReviewModel(connection).create(reviewArgs)
 
         review.transform()
 
         event.reviewId = review.id
         await event.save()
 
-        return res.status(200).json({ message: 'Review created and comment added successfully' })
+        return res.status(200).json({ message: 'Review created and comment added successfully', review: review.id })
 
     } catch (error) {
         return res.status(500).json({ message: 'Oops! Something went wrong...' })
     }
 }
-
 
 export const createMyEvent = async (req: AuthenticatedRequest, res: Response) => {
     console.log("Create My Event")
@@ -273,7 +279,7 @@ export const getMyEventById = async (req: AuthenticatedRequest, res: Response) =
         review = await ReviewModel(connection).findOne({ eventId: id })
 
         if (!event) {
-            return res.status(404).json({ message: `No event found for event: ${id}` })
+            return res.status(404).json({ message: `No event found for ID: ${id}` })
         }
 
         return res.status(200).json({ message: 'Event retrieved successfully', event: event, review: review })
@@ -284,10 +290,61 @@ export const getMyEventById = async (req: AuthenticatedRequest, res: Response) =
 
 }
 
-export const updateMyEventById = async (req: Request, res: Response) => {
+export const updateMyEventById = async (req: AuthenticatedRequest, res: Response) => {
+    console.log('Update My Event by ID')
 
+    const { id } = req.params
+    const { ownerId, reviewId, ...updatedFields } = req.body
+
+    const authId = req.userId
+    const authType = req.userType
+
+    
+    try {
+        if (authType == "student" || (authId !== id && authType !== "admin")) {
+            return res.status(403).json({ message: 'Your not allowed to perform this request' })
+        }
+
+        const event = await EventModel(connection).findByIdAndUpdate(id, updatedFields, { new: true }).exec()
+
+        if (!event) {
+            return res.status(404).json({ message: `No event found for ID: ${id}` })
+        }
+
+        return res.status(200).json({ message: 'Event updated successfully', event: event })
+
+    } catch (error) {
+        return res.status(500).json({ message: 'Oops! Something went wrong...' })
+    }
 }
 
-export const deleteMyEventById = async (req: Request, res: Response) => {
+
+export const deleteMyEventById = async (req: AuthenticatedRequest, res: Response) => {
+    console.log("Delete My Event by ID")
+
+    const authId = req.userId
+    const authType = req.userType
+
+    const { id } = req.params
+
+    let event: IEvent | null
+
+    try {
+        if (authType == "student" || (authId !== id && authType !== "admin")) {
+            return res.status(403).json({ message: 'Your not allowed to perform this request' })
+        }
+
+        event = await EventModel(connection).findByIdAndDelete(id).exec()
+        await ReviewModel(connection).findOneAndDelete({ eventId: id })
+
+        if (!event) {
+            return res.status(404).json({ message: `No event found for ID: ${id}` })
+        }
+
+        return res.status(200).json({ message: 'Event and Reviews deleted successfully' })
+
+    } catch (error) {
+        return res.status(500).json({ message: 'Oops! Something went wrong...' })
+    }
 
 }
