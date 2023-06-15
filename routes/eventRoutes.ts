@@ -1,7 +1,8 @@
 import express, { Request, Response, NextFunction } from 'express'
 import { AuthenticatedRequest } from '../models/Model'
-import { getEvents, getEventById, getEventByIdLike, getEventByIdComment, createMyEvent, getMyEvents, getMyEventById, updateMyEventById, deleteMyEventById } from '../controllers/eventController' 
 import { verifyToken } from '../controllers/authController'
+
+import { getEvents, getEventById, getEventByIdLike, getEventByIdComment, createMyEvent, getMyEvents, getMyEventById, updateMyEventById, deleteMyEventById } from '../controllers/eventController' 
 
 const router = express.Router() 
 

@@ -29,6 +29,7 @@ const reviewModel_1 = __importDefault(require("../models/reviewModel"));
 const eventModel_1 = __importDefault(require("../models/eventModel"));
 const getEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Get Events");
+    let events = [];
     try {
         const { date, type } = req.query;
         const filters = {};
@@ -38,7 +39,7 @@ const getEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (type) {
             filters.type = type;
         }
-        const events = yield (0, eventModel_1.default)(provider_1.connection).find(filters);
+        events = yield (0, eventModel_1.default)(provider_1.connection).find(filters);
         if (!events || events.length === 0) {
             return res.status(404).json({ message: 'No events found' });
         }

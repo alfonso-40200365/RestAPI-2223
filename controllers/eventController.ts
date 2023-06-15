@@ -1,12 +1,14 @@
-import { Request, Response } from 'express'
 import { connection } from '../database/provider'
+import { Request, Response } from 'express'
+import { AuthenticatedRequest } from '../models/Model'
 
 import ReviewModel, { IReview } from '../models/reviewModel'
 import EventModel, { IEvent } from '../models/eventModel'
-import { AuthenticatedRequest } from '../models/Model'
 
 export const getEvents = async (req: Request, res: Response) => {
     console.log("Get Events")
+
+    let events: IEvent[] = []
 
     try {
         const { date, type } = req.query
@@ -20,7 +22,7 @@ export const getEvents = async (req: Request, res: Response) => {
             filters.type = type
         }
 
-        const events = await EventModel(connection).find(filters)
+        events = await EventModel(connection).find(filters)
 
         if (!events || events.length === 0) {
             return res.status(404).json({ message: 'No events found' })
