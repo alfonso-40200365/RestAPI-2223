@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteMyEventById = exports.updateMyEventById = exports.getMyEventById = exports.getMyEvents = exports.createMyEvent = exports.getEventByIdComment = exports.getEventByIdLike = exports.getEventById = exports.getEvents = void 0;
+exports.deleteMyEventById = exports.updateMyEventById = exports.getMyEventById = exports.getMyEvents = exports.createMyEvent = exports.getEventByIdReview = exports.getEventByIdComment = exports.getEventByIdLike = exports.getEventById = exports.getEvents = void 0;
 const provider_1 = require("../database/provider");
 const reviewModel_1 = __importDefault(require("../models/reviewModel"));
 const eventModel_1 = __importDefault(require("../models/eventModel"));
@@ -164,9 +164,46 @@ const getEventByIdComment = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.getEventByIdComment = getEventByIdComment;
+const getEventByIdReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('Get Event by ID and Review');
+    const authId = req.userId;
+    const { id } = req.params;
+    let event;
+    let review;
+    try {
+        event = yield (0, eventModel_1.default)(provider_1.connection).findById(id).exec();
+        if (!event) {
+            return res.status(404).json({ message: `No event found for ID: ${id}` });
+        }
+        // Check if the user has already reviewed the event
+        review = yield (0, reviewModel_1.default)(provider_1.connection).findOne({ 'ratings.userId': authId }).exec();
+        if (review) {
+            return res.status(409).json({ message: 'You have already reviewed this event' });
+        }
+        const { rating, comment } = req.body;
+        if (!rating || typeof rating !== 'number' || rating < 1 || rating > 5) {
+            return res.status(400).json({ message: 'Invalid rating. Please provide a number from 1 to 5' });
+        }
+        // Create a new review
+        review = yield (0, reviewModel_1.default)(provider_1.connection).create({
+            ratings: [{ userId: authId, rating }],
+            comments: [{ userId: authId, comment, timeStamp: new Date() }],
+            likes: [],
+        });
+        review.transform();
+        // Update the event with the new review ID
+        event.reviewId = review.id;
+        yield event.save();
+        return res.status(200).json({ message: 'Review created successfully', review: review.id });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Oops! Something went wrong...' });
+    }
+});
+exports.getEventByIdReview = getEventByIdReview;
 const createMyEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Create My Event");
-    const { ownerId, reviewId, title, description, location, type } = req.body;
+    const { ownerId, title, description, location, type } = req.body;
     const authId = req.userId;
     const authType = req.userType;
     let { date } = req.body;
@@ -180,7 +217,7 @@ const createMyEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         if (!ownerId || !title || !description || !location || !type) {
             return res.status(400).json({ message: 'Please provide ownerId, title, description, location and type' });
         }
-        if (authType !== "admin" && ownerId !== authId) {
+        if (authType == "student") {
             return res.status(403).json({ message: "You are not authorized to perform this request" });
         }
         event = yield (0, eventModel_1.default)(provider_1.connection)
@@ -189,7 +226,7 @@ const createMyEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             return res.status(409).json({ message: 'Event Title already exists' });
         }
         event = yield (0, eventModel_1.default)(provider_1.connection)
-            .create({ ownerId, reviewId, title, description, location, date, type });
+            .create({ ownerId, reviewId: "", title, description, location, date, type });
         if (!event) {
             return res.status(500).json({ message: 'Failed to create event' });
         }

@@ -15,5 +15,6 @@ router.get('/', eventController_1.getEvents); // --Done
 router.get('/:id', eventController_1.getEventById); // --Done
 router.delete('/:id', (req, res, next) => (0, authController_1.verifyToken)(req, res, next), (req, res) => (0, eventController_1.deleteMyEventById)(req, res)); // --Done
 router.patch('/:id/like', (req, res, next) => (0, authController_1.verifyToken)(req, res, next), (req, res) => (0, eventController_1.getEventByIdLike)(req, res)); // --Done
+router.patch('/:id/review', (req, res, next) => (0, authController_1.verifyToken)(req, res, next), (req, res) => (0, eventController_1.getEventByIdReview)(req, res)); // --Done
 router.patch('/:id/comment', (req, res, next) => (0, authController_1.verifyToken)(req, res, next), (req, res) => (0, eventController_1.getEventByIdComment)(req, res)); // --Done
 exports.default = router;

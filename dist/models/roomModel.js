@@ -15,7 +15,7 @@ var TypeRoom;
 const schema = {
     ownerId: { type: mongoose_1.default.SchemaTypes.String, required: true, unique: false },
     reviewId: { type: mongoose_1.default.SchemaTypes.String, required: true, unique: false },
-    reservationId: { type: mongoose_1.default.SchemaTypes.String, required: true, unique: false },
+    reservationId: { type: [mongoose_1.default.SchemaTypes.String], required: true, unique: false },
     title: { type: mongoose_1.default.SchemaTypes.String, required: true, unique: false },
     description: { type: mongoose_1.default.SchemaTypes.String, required: true, unique: false },
     location: { type: mongoose_1.default.SchemaTypes.String, required: true, unique: false },

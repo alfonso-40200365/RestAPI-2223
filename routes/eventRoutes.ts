@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from 'express'
 import { AuthenticatedRequest } from '../models/Model'
 import { verifyToken } from '../controllers/authController'
 
-import { getEvents, getEventById, getEventByIdLike, getEventByIdComment, createMyEvent, getMyEvents, getMyEventById, updateMyEventById, deleteMyEventById } from '../controllers/eventController' 
+import { getEvents, getEventById, getEventByIdLike, getEventByIdReview, getEventByIdComment, createMyEvent, getMyEvents, getMyEventById, updateMyEventById, deleteMyEventById } from '../controllers/eventController' 
 
 const router = express.Router() 
 
@@ -17,6 +17,7 @@ router.get('/', getEvents) // --Done
 router.get('/:id', getEventById) // --Done
 router.delete('/:id', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => deleteMyEventById(req as AuthenticatedRequest, res)) // --Done
 router.patch('/:id/like', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => getEventByIdLike(req as AuthenticatedRequest, res)) // --Done
+router.patch('/:id/review', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => getEventByIdReview(req as AuthenticatedRequest, res)) // --Done
 router.patch('/:id/comment', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => getEventByIdComment(req as AuthenticatedRequest, res)) // --Done
 
 export default router 

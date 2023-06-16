@@ -188,10 +188,59 @@ export const getEventByIdComment = async (req: AuthenticatedRequest, res: Respon
     }
 }
 
+export const getEventByIdReview = async (req: AuthenticatedRequest, res: Response) => {
+    console.log('Get Event by ID and Review')
+  
+    const authId = req.userId
+  
+    const { id } = req.params
+  
+    let event: IEvent | null
+    let review: IReview | null
+  
+    try {
+      event = await EventModel(connection).findById(id).exec()
+  
+      if (!event) {
+        return res.status(404).json({ message: `No event found for ID: ${id}` })
+      }
+  
+      // Check if the user has already reviewed the event
+      review = await ReviewModel(connection).findOne({ 'ratings.userId': authId }).exec()
+  
+      if (review) {
+        return res.status(409).json({ message: 'You have already reviewed this event' })
+      }
+  
+      const { rating, comment } = req.body
+  
+      if (!rating || typeof rating !== 'number' || rating < 1 || rating > 5) {
+        return res.status(400).json({ message: 'Invalid rating. Please provide a number from 1 to 5' })
+      }
+  
+      // Create a new review
+      review = await ReviewModel(connection).create({
+        ratings: [{ userId: authId, rating }],
+        comments: [{ userId: authId, comment, timeStamp: new Date() }],
+        likes: [],
+      })
+  
+      review.transform()
+  
+      // Update the event with the new review ID
+      event.reviewId = review.id
+      await event.save()
+  
+      return res.status(200).json({ message: 'Review created successfully', review: review.id })
+    } catch (error) {
+      return res.status(500).json({ message: 'Oops! Something went wrong...' })
+    }
+}
+  
 export const createMyEvent = async (req: AuthenticatedRequest, res: Response) => {
     console.log("Create My Event")
 
-    const { ownerId, reviewId, title, description, location, type } = req.body
+    const { ownerId, title, description, location, type } = req.body
     const authId = req.userId
     const authType = req.userType
 
@@ -210,7 +259,7 @@ export const createMyEvent = async (req: AuthenticatedRequest, res: Response) =>
             return res.status(400).json({ message: 'Please provide ownerId, title, description, location and type' })
         }
 
-        if (authType !== "admin" && ownerId !== authId) {
+        if (authType == "student") {
             return res.status(403).json({ message: "You are not authorized to perform this request" })
         }
 
@@ -222,7 +271,7 @@ export const createMyEvent = async (req: AuthenticatedRequest, res: Response) =>
         }
 
         event = await EventModel(connection)
-            .create({ ownerId, reviewId, title, description, location, date, type })
+            .create({ ownerId, reviewId: "", title, description, location, date, type })
 
         if (!event) {
             return res.status(500).json({ message: 'Failed to create event' })
@@ -319,7 +368,6 @@ export const updateMyEventById = async (req: AuthenticatedRequest, res: Response
         return res.status(500).json({ message: 'Oops! Something went wrong...' })
     }
 }
-
 
 export const deleteMyEventById = async (req: AuthenticatedRequest, res: Response) => {
     console.log("Delete My Event by ID")

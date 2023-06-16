@@ -11,8 +11,8 @@ var TypeRoom;
     TypeRoom["QuartoPrivado"] = "quarto privado";
     TypeRoom["QuartoPartilhado"] = "quarto partilhado";
     TypeRoom["Apartamento"] = "apartamento";
-    TypeRoom["Casa"] = "casa";
     TypeRoom["Moradia"] = "moradia";
+    TypeRoom["Residencia"] = "residencia";
 })(TypeRoom || (TypeRoom = {}));
 var TypeEvent;
 (function (TypeEvent) {

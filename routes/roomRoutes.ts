@@ -1,22 +1,24 @@
-import express from 'express' 
-import { getRooms, getRoomById, functionTODO } from '../controllers/roomController' 
+import express, { Request, Response, NextFunction } from 'express'
+import { AuthenticatedRequest } from '../models/Model'
+import { verifyToken } from '../controllers/authController'
+
+import { getRooms, getRoomById, getRoomByIdLike, getRoomByIdComment, getRoomByIdReview, createMyRoom, getMyRooms, getMyRoomById, updateMyRoomById, deleteMyRoomById } from '../controllers/roomController' 
 
 const router = express.Router() 
 
-router.get('/', getRooms) 
-router.get('/:id', getRoomById) 
 
-router.patch('/:id/like', functionTODO) 
-router.patch('/:id/comment', functionTODO) 
-router.patch('/:id/reserve', functionTODO) 
+router.post('/myRooms', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => createMyRoom(req as AuthenticatedRequest, res)) // --DONE
 
-router.post('/myRooms', functionTODO)
+router.get('/myRooms', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => getMyRooms(req as AuthenticatedRequest, res)) // --DONE
+router.get('/myRooms/:id', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => getMyRoomById(req as AuthenticatedRequest, res)) // --DONE
+router.patch('/myRooms/:id',(req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => updateMyRoomById(req as AuthenticatedRequest, res)) // --DONE
 
-router.get('/myRooms', functionTODO)
-router.get('/myRooms/:id', functionTODO)
+router.get('/', getRooms) // --DONE
+router.get('/:id', getRoomById) // --DONE
+router.delete('/:id', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => deleteMyRoomById(req as AuthenticatedRequest, res)) // --DONE
+router.patch('/:id/like', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => getRoomByIdLike(req as AuthenticatedRequest, res)) // --DONE
+router.patch('/:id/review', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => getRoomByIdReview(req as AuthenticatedRequest, res)) // --DONE
+router.patch('/:id/comment', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => getRoomByIdComment(req as AuthenticatedRequest, res)) // --DONE
+//router.patch('/:id/reserve', (req: Request, res: Response, next: NextFunction) => verifyToken(req as AuthenticatedRequest, res, next), (req: Request, res: Response) => getRoomByIdReserve(req as AuthenticatedRequest, res)) 
 
-router.patch('/myRooms/:id', functionTODO)
-
-router.delete('/myRooms/:id', functionTODO)
-
-export default router 
+export default router

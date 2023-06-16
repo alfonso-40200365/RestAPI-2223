@@ -56,5 +56,23 @@ const getOwners = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.getOwners = getOwners;
 const updateOwnerById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Update Owner by ID");
+    const authType = req.userType;
+    const { id } = req.params;
+    let user;
+    try {
+        if (authType !== "admin") {
+            return res.status(403).json({ message: 'Your not allowed to perform this request' });
+        }
+        user = yield (0, userModel_1.default)(provider_1.connection).findById(id).exec();
+        if (!user) {
+            return res.status(404).json({ message: `No Owners found for ID: ${id}` });
+        }
+        user.verified = !user.verified;
+        user = yield user.save();
+        return res.status(200).json({ message: 'Owners updated successfully', verified: user.verified });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Oops! Something went wrong...' });
+    }
 });
 exports.updateOwnerById = updateOwnerById;

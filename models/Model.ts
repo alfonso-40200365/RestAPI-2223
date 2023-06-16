@@ -24,8 +24,8 @@ enum TypeRoom {
     QuartoPrivado = "quarto privado",
     QuartoPartilhado = "quarto partilhado",
     Apartamento = "apartamento",
-    Casa = "casa",
     Moradia = "moradia",
+    Residencia = "residencia",
 }
 
 enum TypeEvent {

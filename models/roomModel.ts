@@ -12,7 +12,7 @@ export interface IRoom extends mongoose.Document {
     id: string
     ownerId: string
     reviewId: string
-    reservationId: string
+    reservationId: string[]
     title: string
     description: string
     location: string
@@ -27,7 +27,7 @@ export interface IRoom extends mongoose.Document {
 const schema: mongoose.SchemaDefinition = {
     ownerId: { type: mongoose.SchemaTypes.String, required: true, unique: false },
     reviewId: { type: mongoose.SchemaTypes.String, required: true, unique: false },
-    reservationId: { type: mongoose.SchemaTypes.String, required: true, unique: false },
+    reservationId: { type: [mongoose.SchemaTypes.String], required: true, unique: false },
     title: { type: mongoose.SchemaTypes.String, required: true, unique: false },
     description: { type: mongoose.SchemaTypes.String, required: true, unique: false },
     location: { type: mongoose.SchemaTypes.String, required: true, unique: false },
