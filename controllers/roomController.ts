@@ -237,7 +237,7 @@ export const getRoomByIdReview = async (req: AuthenticatedRequest, res: Response
         return res.status(409).json({ message: 'You have already reviewed this room' })
       }
   
-      const { rating, comment } = req.body
+      const { rating } = req.body
   
       if (!rating || typeof rating !== 'number' || rating < 1 || rating > 5) {
         return res.status(400).json({ message: 'Invalid rating. Please provide a number from 1 to 5' })
@@ -246,7 +246,7 @@ export const getRoomByIdReview = async (req: AuthenticatedRequest, res: Response
       // Create a new review
       review = await ReviewModel(connection).create({
         ratings: [{ userId: authId, rating }],
-        comments: [{ userId: authId, comment, timeStamp: new Date() }],
+        comments: [],
         likes: [],
       })
   

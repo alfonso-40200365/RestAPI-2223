@@ -180,18 +180,16 @@ const getEventByIdReview = (req, res) => __awaiter(void 0, void 0, void 0, funct
         if (review) {
             return res.status(409).json({ message: 'You have already reviewed this event' });
         }
-        const { rating, comment } = req.body;
+        const { rating } = req.body;
         if (!rating || typeof rating !== 'number' || rating < 1 || rating > 5) {
             return res.status(400).json({ message: 'Invalid rating. Please provide a number from 1 to 5' });
         }
-        // Create a new review
         review = yield (0, reviewModel_1.default)(provider_1.connection).create({
             ratings: [{ userId: authId, rating }],
-            comments: [{ userId: authId, comment, timeStamp: new Date() }],
+            comments: [],
             likes: [],
         });
         review.transform();
-        // Update the event with the new review ID
         event.reviewId = review.id;
         yield event.save();
         return res.status(200).json({ message: 'Review created successfully', review: review.id });
