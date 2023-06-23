@@ -236,7 +236,7 @@ const createMyRoom = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             return res.status(403).json({ message: "You are not authorized to perform this request" });
         }
         room = yield (0, roomModel_1.default)(provider_1.connection)
-            .create({ authId, reviewId: "", reservationId: [], title, description, location, availability, price, numBeds, numPeople, type, });
+            .create({ ownerId: authId, reviewId: "", reservationId: [], title, description, location, availability, price, numBeds, numPeople, type, });
         if (!room) {
             return res.status(500).json({ message: 'Failed to create room' });
         }

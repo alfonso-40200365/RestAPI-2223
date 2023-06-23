@@ -281,7 +281,7 @@ export const createMyRoom = async (req: AuthenticatedRequest, res: Response) => 
         }
 
         room = await RoomModel(connection)
-            .create({ authId, reviewId: "", reservationId: [], title, description, location, availability, price, numBeds, numPeople, type, })
+            .create({ ownerId: authId, reviewId: "", reservationId: [], title, description, location, availability, price, numBeds, numPeople, type, })
 
         if (!room) {
             return res.status(500).json({ message: 'Failed to create room' })
