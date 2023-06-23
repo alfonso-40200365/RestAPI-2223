@@ -290,7 +290,7 @@ export const createMyRoom = async (req: AuthenticatedRequest, res: Response) => 
         return res.status(201).json({ message: 'Room created successfully', roomId: room.id })
 
     } catch (error) {
-        return res.status(500).json({ message: 'Oops! Something went wrong...' })
+        return res.status(500).json({ message: 'Oops! Something went wrong...', error: error })
     }
 }
 
