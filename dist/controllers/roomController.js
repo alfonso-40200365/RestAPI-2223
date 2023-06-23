@@ -243,7 +243,7 @@ const createMyRoom = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         return res.status(201).json({ message: 'Room created successfully', roomId: room.id });
     }
     catch (error) {
-        return res.status(500).json({ message: 'Oops! Something went wrong...' });
+        return res.status(500).json({ message: 'Oops! Something went wrong...', error: error });
     }
 });
 exports.createMyRoom = createMyRoom;
